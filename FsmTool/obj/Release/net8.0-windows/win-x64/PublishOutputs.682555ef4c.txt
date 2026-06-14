@@ -1,0 +1,2 @@
+C:\Users\Alex\Desktop\VulkanRender\Plugins\Fsm-Editor\FsmTool\bin\Release\net8.0-windows\publish\win-x64\FsmTool.pdb
+C:\Users\Alex\Desktop\VulkanRender\Plugins\Fsm-Editor\FsmTool\bin\Release\net8.0-windows\publish\win-x64\FsmTool.exe

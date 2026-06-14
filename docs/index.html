@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Documentation for the @FSM (Finite State Machine) format used by Kingdom Hearts 3D: Dream Drop Distance to drive entity AI.">
+<meta name="theme-color" content="#151515">
+<meta name="color-scheme" content="dark">
+<title>Kingdom Hearts 3D — FSM (Finite State Machine) | OpenKh-style</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#1a1a1a; --bg-bar:#151515; --panel:#202020;
+    --text:#d6d6d6; --dim:#9a9a9a; --head:#ffffff;
+    --link:#5fb3e6; --link-hover:#8fccf0;
+    --rule:#333; --rule-soft:#2a2a2a;
+    --code-bg:#262626; --type:#e0a978; --num:#9ccfd8; --kw:#c4a7e7;
+    --accent:#4fc3f7;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; background:#1a1a1a}
+  body{
+    margin:0; background:var(--bg); color:var(--text); min-height:100vh;
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--link); text-decoration:none}
+  a:hover{color:var(--link-hover); text-decoration:underline}
+  code,.mono{font-family:"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace; font-size:.92em}
+  code{background:var(--code-bg); color:var(--type); padding:.08em .4em; border-radius:4px}
+
+  /* top bar */
+  .bar{background:var(--bg-bar); border-bottom:1px solid var(--rule); padding:18px 0}
+  .bar .wrap{display:flex; align-items:baseline; gap:16px; flex-wrap:wrap}
+  .bar .logo{font-size:22px; font-weight:700; color:var(--head); letter-spacing:.5px}
+  .bar .logo span{color:var(--accent)}
+  .bar .tag{color:var(--dim); font-size:13px; flex:1 1 320px; min-width:220px}
+  .bar .gh{font-size:13px; border:1px solid var(--rule); padding:5px 11px; border-radius:6px; color:var(--text)}
+  .bar .gh:hover{background:var(--panel); text-decoration:none; border-color:#444}
+
+  .wrap{max-width:880px; margin:0 auto; padding:0 22px}
+  main{padding:30px 0 80px}
+
+  h1{color:var(--head); font-size:28px; font-weight:700; line-height:1.25;
+     margin:6px 0 4px; padding-bottom:14px; border-bottom:1px solid var(--rule)}
+  h1 .crumb{display:block; font-size:14px; font-weight:500; color:var(--dim); margin-bottom:8px}
+  h1 .crumb a{color:var(--dim)}
+  h2{color:var(--head); font-size:21px; font-weight:600; margin:42px 0 8px;
+     padding-bottom:8px; border-bottom:1px solid var(--rule-soft)}
+  h3{color:var(--head); font-size:16px; font-weight:600; margin:26px 0 6px}
+  p{margin:12px 0}
+  .dim{color:var(--dim)}
+
+  /* TOC */
+  .toc{background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+       padding:14px 18px; margin:22px 0 8px}
+  .toc h4{margin:0 0 8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+  .toc ul{margin:0; padding:0; list-style:none; columns:2; column-gap:26px}
+  .toc li{margin:3px 0; break-inside:avoid}
+  @media(max-width:560px){ .toc ul{columns:1} }
+
+  /* tables */
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px}
+  th,td{border:1px solid var(--rule); padding:7px 11px; text-align:left; vertical-align:top}
+  th{background:var(--panel); color:var(--head); font-weight:600}
+  td:first-child,th:first-child{white-space:nowrap}
+  tbody tr:nth-child(even){background:#1e1e1e}
+  table .mono{color:var(--num)}
+  table .ty{color:var(--type)}
+
+  /* callout */
+  .note{border-left:3px solid var(--accent); background:#16242b;
+        padding:10px 16px; margin:18px 0; border-radius:0 6px 6px 0}
+  .note.warn{border-left-color:#e0a978; background:#241f18}
+  .note p:first-child{margin-top:0} .note p:last-child{margin-bottom:0}
+
+  /* struct block */
+  pre{background:var(--code-bg); border:1px solid var(--rule); border-radius:8px;
+      padding:14px 16px; overflow:auto; margin:14px 0; line-height:1.5}
+  pre code{background:none; color:var(--text); padding:0}
+  pre .kw{color:var(--kw)} pre .ty{color:var(--type)} pre .num{color:var(--num)} pre .cm{color:#6a6a6a}
+
+  hr{border:0; border-top:1px solid var(--rule); margin:46px 0}
+  footer{color:var(--dim); font-size:13px; padding:0 0 60px}
+  footer a{color:var(--dim)}
+  .pill{display:inline-block; font-size:11px; font-family:monospace; color:#bdbdbd;
+        background:var(--panel); border:1px solid var(--rule); border-radius:10px; padding:1px 8px}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="logo">Open<span>Kh</span></div>
+    <div class="tag">A centralized place for documentation and discoveries about the internal working of Kingdom Hearts games.</div>
+    <a class="gh" href="https://github.com/OpenKH/OpenKh">View on GitHub</a>
+  </div>
+</div>
+
+<div class="wrap">
+<main>
+
+  <h1>
+    <span class="crumb"><a href="#">Kingdom Hearts 3D: Dream Drop Distance</a> — file formats</span>
+    FSM (Finite State Machine)
+  </h1>
+
+  <p><code>.fsm</code> files describe the <strong>AI brain</strong> of an entity in <em>Kingdom Hearts 3D: Dream Drop
+  Distance</em>. Each file is a finite state machine: a set of <a href="#states">states</a> (Idle, Pursuit, Attack1…),
+  the <a href="#entry">transitions</a> between them, and the <a href="#detail">conditions</a> that gate each transition.
+  The engine sits in one state, evaluates that state's outgoing transitions every tick, and moves to the first state
+  whose conditions are all satisfied.</p>
+
+  <p>They are found alongside the other per-object files (e.g. <code>m_di020.fsm</code> for a companion,
+  <code>m_de120.fsm</code> / <code>b_de020.fsm</code> for enemies and bosses). The format is a flat binary identified by
+  the ASCII magic <code>@FSM</code>; everything is little-endian.</p>
+
+  <div class="note">
+    <p>This document describes <strong>version&nbsp;3</strong> (the value at offset <code>0x04</code>), the only version
+    observed so far. It was reverse-engineered from companion, enemy and boss files and validated against
+    <span class="pill">m_di020 · 4,896 B</span> <span class="pill">m_de120 · 17.5 KB</span>
+    <span class="pill">m_de490 · 18 KB</span> <span class="pill">b_de020 · 26.9 KB</span>.</p>
+  </div>
+
+  <div class="toc">
+    <h4>Contents</h4>
+    <ul>
+      <li><a href="#layout">File layout</a></li>
+      <li><a href="#header">Header</a></li>
+      <li><a href="#symtab">Symbol table</a></li>
+      <li><a href="#records">Record table</a></li>
+      <li><a href="#entry">Transition entry</a></li>
+      <li><a href="#detail">Condition detail</a></li>
+      <li><a href="#ops">Operator codes</a></li>
+      <li><a href="#params">Parameter kinds</a></li>
+      <li><a href="#semantics">Evaluation &amp; editing</a></li>
+      <li><a href="#vocab">Common names</a></li>
+    </ul>
+  </div>
+
+  <!-- ───────────────────────── layout ───────────────────────── -->
+  <h2 id="layout">File layout</h2>
+  <p>The file is four regions back-to-back. Cross-references between regions are stored as raw <em>file offsets</em>
+  (not indices), so nothing can be moved without re-pointing everything that referenced it.</p>
+
+  <table>
+    <thead><tr><th>Region</th><th>Location</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#header">Header</a></td><td class="mono">0x00 – 0x0C</td><td>Magic, version, and the offset where the symbol table ends.</td></tr>
+      <tr><td><a href="#symtab">Symbol table</a></td><td class="mono">0x0C – dataOffset</td><td>Named strings — every state and condition variable. Referenced by byte offset.</td></tr>
+      <tr><td><a href="#records">Record table</a></td><td class="mono">scanned</td><td>One 80-byte record per outgoing transition, grouped by owning state.</td></tr>
+      <tr><td><a href="#entry">Entry / detail data</a></td><td class="mono">pointed-to</td><td>The transition entries and their condition lists, reached through pointers.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ───────────────────────── header ───────────────────────── -->
+  <h2 id="header">Header</h2>
+  <p>The first 12 bytes.</p>
+  <table>
+    <thead><tr><th>Offset</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x00</td><td class="ty">char[4]</td><td>Magic — always <code>@FSM</code>.</td></tr>
+      <tr><td class="mono">0x04</td><td class="ty">u16</td><td>Version. Observed value: <code>3</code>.</td></tr>
+      <tr><td class="mono">0x06</td><td class="ty">u16</td><td>Unknown (flags?).</td></tr>
+      <tr><td class="mono">0x08</td><td class="ty">u32</td><td><strong>Data offset</strong> — the byte where the symbol table ends. The symbol table occupies <code>0x0C</code> up to this value, so <code>symbolCount = (dataOffset − 0x0C) / 36</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ───────────────────────── symtab ───────────────────────── -->
+  <h2 id="symtab">Symbol table</h2>
+  <p>An array of fixed 36-byte entries running from <code>0x0C</code> to the <a href="#header">data offset</a>. Every
+  string the file needs lives here exactly once — both <a href="#states">state names</a> and
+  <a href="#detail">condition variable names</a>. Everywhere else in the file, a symbol is referenced by the
+  <em>byte offset of its name field</em>.</p>
+
+  <table>
+    <thead><tr><th>Offset</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x00</td><td class="ty">char[32]</td><td>Symbol name, ASCII, null-padded.</td></tr>
+      <tr><td class="mono">0x20</td><td class="ty">u32</td><td>Symbol id (a hash/index; not needed to resolve references).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <p>The format does <strong>not</strong> tag whether a symbol is a state or a condition. That is derived
+    structurally — see <a href="#semantics">Evaluation &amp; editing</a>.</p>
+  </div>
+
+  <!-- ───────────────────────── records ───────────────────────── -->
+  <h2 id="records">Record table</h2>
+  <p>An array of <strong>80-byte</strong> records. Each record is one outgoing transition; a state that has several
+  transitions owns several consecutive records. Only three fields are needed to walk the machine — the rest of each
+  record is currently unknown / padding.</p>
+
+  <table>
+    <thead><tr><th>Offset</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x04</td><td class="ty">u16</td><td>Record index.</td></tr>
+      <tr><td class="mono">0x08</td><td class="ty">u32</td><td>Entry pointer — file offset of this transition's <a href="#entry">entry block</a>.</td></tr>
+      <tr><td class="mono">0x0C</td><td class="ty">u32</td><td>Owner name offset — the <a href="#symtab">symbol offset</a> of the state that owns this transition.</td></tr>
+      <tr><td class="mono">…</td><td class="ty">—</td><td>Remaining bytes: unknown / padding.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <p><strong>Locating the table.</strong> The record table is not at a fixed offset. Locate it by scanning forward
+    from the end of the symbol table for the longest run of consecutive 80-byte records whose owner field
+    (<code>+0x0C</code>) is a valid symbol offset.</p>
+  </div>
+
+  <!-- ───────────────────────── entry ───────────────────────── -->
+  <h2 id="entry">Transition entry</h2>
+  <p>Pointed to by a record's entry pointer (<code>record + 0x08</code>). It names the destination state and points at
+  the condition list.</p>
+
+  <table>
+    <thead><tr><th>Offset</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x00</td><td class="ty">u32</td><td><strong>Target pointer</strong> — a file offset pointing at the <em>owner-name field</em> (<code>+0x0C</code>) of the destination state's record. Dereference it to get that state's <a href="#symtab">symbol offset</a>, hence its name.</td></tr>
+      <tr><td class="mono">0x04</td><td class="ty">u16</td><td>Tag / flags (unknown).</td></tr>
+      <tr><td class="mono">0x06</td><td class="ty">u16</td><td>Condition count.</td></tr>
+      <tr><td class="mono">0x08</td><td class="ty">u32</td><td>Detail pointer — file offset of the <a href="#detail">condition detail</a> array.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="dim">Because the target is reached by pointing at a state's record, re-targeting a transition is just
+  overwriting this one <code>u32</code> with the owner-field offset of a different state — no bytes move.</p>
+
+  <!-- ───────────────────────── detail ───────────────────────── -->
+  <h2 id="detail">Condition detail</h2>
+  <p>An array of <code>conditionCount</code> entries, 12 bytes each, at the entry's detail pointer. A transition fires
+  only when <strong>all</strong> of its conditions hold (logical AND); a count of zero means the transition always
+  fires.</p>
+
+  <table>
+    <thead><tr><th>Offset</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x00</td><td class="ty">u32</td><td>Condition-name offset — the <a href="#symtab">symbol offset</a> of the variable being tested (e.g. <code>Probability</code>, <code>TargetDistance</code>).</td></tr>
+      <tr><td class="mono">0x04</td><td class="ty">u32</td><td><a href="#ops">Operator</a> code.</td></tr>
+      <tr><td class="mono">0x08</td><td class="ty">u32</td><td>Parameter value. Its <a href="#params">interpretation</a> depends on the operator and variable.</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code><span class="cm">// the chain that resolves one transition</span>
+record <span class="num">+0x08</span>  →  entry
+                 ├─ <span class="num">+0x00</span>  →  destination state record   <span class="cm">(target)</span>
+                 ├─ <span class="num">+0x06</span>  =  condition count
+                 └─ <span class="num">+0x08</span>  →  detail[0 .. count]
+                              ├─ <span class="num">+0x00</span>  →  variable name   <span class="cm">(symbol)</span>
+                              ├─ <span class="num">+0x04</span>  =  operator
+                              └─ <span class="num">+0x08</span>  =  value</code></pre>
+
+  <!-- ───────────────────────── ops ───────────────────────── -->
+  <h2 id="ops">Operator codes</h2>
+  <p>The <code>u32</code> at <code>detail + 0x04</code>. A comparison operator carries a numeric threshold; <code>is</code>
+  carries a 0/1 flag. Labels are best-effort.</p>
+
+  <table>
+    <thead><tr><th>Code</th><th>Operator</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0x21</td><td><code>is</code></td><td>Boolean / equality. Value is a 0/1 flag.</td></tr>
+      <tr><td class="mono">0x01</td><td><code>&lt;</code></td><td>Less-than. Numeric threshold.</td></tr>
+      <tr><td class="mono">0x03</td><td><code>&lt;=</code></td><td>Less-than-or-equal.</td></tr>
+      <tr><td class="mono">0x04</td><td><code>&lt;</code></td><td>Alternate less-than seen in the wild.</td></tr>
+      <tr><td class="mono">0x05</td><td><code>&gt;</code></td><td>Greater-than.</td></tr>
+      <tr><td class="mono">0x06</td><td><code>&gt;=</code></td><td>Greater-than-or-equal.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ───────────────────────── params ───────────────────────── -->
+  <h2 id="params">Parameter kinds</h2>
+  <p>The parameter is a raw 32-bit word; how to read it is inferred from the operator and the variable rather than stored
+  explicitly.</p>
+
+  <table>
+    <thead><tr><th>Kind</th><th>When</th><th>Read as</th></tr></thead>
+    <tbody>
+      <tr><td><code>bool</code></td><td><code>is</code> (0x21) with a raw value of 0 or 1.</td><td>Flag (false / true).</td></tr>
+      <tr><td><code>int</code></td><td>A comparison operator with a small raw value (<code>&lt; 0x10000</code>).</td><td>Integer count / enum, e.g. <code>Counter &lt; 1</code>.</td></tr>
+      <tr><td><code>float</code></td><td>A comparison operator with a real 32-bit float bit-pattern.</td><td>IEEE‑754 threshold — times, distances, heights.</td></tr>
+      <tr><td><code>percent</code></td><td>Known percentage variables: <code>Probability</code>, <code>CompanionHealth</code>, <code>MyHealth</code>.</td><td>Float, shown as a percentage.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ───────────────────────── semantics ───────────────────────── -->
+  <h2 id="semantics">Evaluation &amp; editing</h2>
+
+  <h3>How a state ticks</h3>
+  <p>While in a state, the engine evaluates that state's outgoing transitions in order and takes the first whose
+  conditions all pass. <code>Idle</code> is the universal fallback / follow state; pointing transitions at <code>Idle</code>
+  effectively strips an entity's native behaviour and pins it there.</p>
+
+  <h3 id="states">States vs. conditions</h3>
+  <p>Since symbols are untyped, classification is structural: a symbol used as a <strong>record owner</strong> or as a
+  <strong>transition target</strong> is a <em>state</em>; any other symbol referenced as a condition name is a
+  <em>condition variable</em>. This reproduces the correct split on every file tested and generalises to names never
+  seen before.</p>
+
+  <h3>In-place editing</h3>
+  <p>Four things a transition expresses — its target, and each condition's variable, operator and value — are all single
+  <code>u32</code> fields holding either a symbol offset or a literal. Each can be overwritten with another valid value
+  of the same width, so no pointer ever moves and the file cannot be structurally corrupted. Adding or removing
+  transitions/conditions, by contrast, changes counts and array sizes and would shift every following offset.</p>
+
+  <div class="note">
+    <p>This size-preserving property is what makes safe editing practical: retarget a transition, swap a condition's
+    variable or operator, or tweak a threshold — all as 4-byte patches in place.</p>
+  </div>
+
+  <!-- ───────────────────────── vocab ───────────────────────── -->
+  <h2 id="vocab">Common names</h2>
+  <p>A non-exhaustive list gathered from companion, enemy and boss files.</p>
+
+  <table>
+    <thead><tr><th>Kind</th><th>Names</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>States</td>
+        <td><code>Idle</code>, <code>Pursuit</code>, <code>Wander</code>, <code>Evade</code>, <code>Blank</code>,
+        <code>Attack1</code>–<code>Attack7</code>, <code>Magic1</code>–<code>Magic5</code>,
+        <code>Action2</code>–<code>Action7</code>, <code>CircleMove</code>, <code>MeanderingMove</code>,
+        <code>SpiralMove</code>, <code>Warp</code>, <code>Back</code>, <code>Call</code>,
+        <code>Idle1</code>/<code>Idle2</code>/<code>Idle3</code></td>
+      </tr>
+      <tr>
+        <td>Condition variables</td>
+        <td><code>Probability</code>, <code>Time</code>, <code>Counter</code>, <code>TargetDistance</code>,
+        <code>TargetHeight</code>, <code>GlobalTimer1</code>/<code>2</code>/<code>3</code>, <code>Damage</code>,
+        <code>EndState</code>, <code>GenericFlag1</code>/<code>2</code>/<code>6</code>,
+        <code>CompanionHealth</code>, <code>MyHealth</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+  <footer>
+    <p>Reverse-engineered for <em>Kingdom Hearts 3D: Dream Drop Distance</em>. Field names are descriptive; unknown fields
+    are marked as such. Corrections and additions welcome.</p>
+  </footer>
+
+</main>
+</div>
+</body>
+</html>
